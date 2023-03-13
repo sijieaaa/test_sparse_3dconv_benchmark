@@ -1,4 +1,4 @@
-# test_sparse_3dconv
+# A benchmark for sparse 3D conv python libraries
 
 
 - install mmloc
