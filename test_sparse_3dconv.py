@@ -1,5 +1,3 @@
-
-
 import numpy as np
 import torch
 from spconv.pytorch.utils import PointToVoxel, gather_features_by_pc_voxel_id
@@ -23,9 +21,12 @@ from torchsparse import SparseTensor
 
 
 
-batch_size = 256
+batch_size = 128
 num_points = 4096
-quantization_size = 0.1
+quantization_size = 0.05
+num_iters = 200
+kernel_size = 5
+
 
 
 
@@ -34,13 +35,21 @@ def quantization(pc, quantization_size):
     return quantized_pc
 
 
+
+
 class MinkNet(nn.Module):
     def __init__(self):
         super().__init__()
         self.model = nn.Sequential(
-            ME.MinkowskiConvolution(1, 64, kernel_size=5,dimension=3), # [1,64,5,3]
+            ME.MinkowskiConvolution(1, 64, kernel_size=kernel_size,dimension=3), # [1,64,5,3]
             ME.MinkowskiBatchNorm(64),
-            ME.MinkowskiReLU(64)
+            ME.MinkowskiReLU(True),
+            ME.MinkowskiConvolution(64, 64, kernel_size=kernel_size,dimension=3), # [1,64,5,3]
+            ME.MinkowskiBatchNorm(64),
+            ME.MinkowskiReLU(True),
+            ME.MinkowskiConvolution(64, 64, kernel_size=kernel_size,dimension=3), # [1,64,5,3]
+            ME.MinkowskiBatchNorm(64),
+            ME.MinkowskiReLU(True),
         )
     def forward(self, x):
         x = self.model(x)
@@ -54,9 +63,18 @@ class SPNet(nn.Module):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.model = nn.Sequential(
-            spconv.SparseConv3d(1, 64, kernel_size=5, algo=ConvAlgo.MaskImplicitGemm),
+            # spconv.SparseConv3d(1, 64, kernel_size=kernel_size, algo=ConvAlgo.MaskImplicitGemm),
+            spconv.SubMConv3d(1, 64, kernel_size=3),
             spconv.SparseBatchNorm(64),
-            spconv.SparseReLU()
+            spconv.SparseReLU(),
+            # spconv.SparseConv3d(64, 64, kernel_size=kernel_size, algo=ConvAlgo.MaskImplicitGemm),
+            spconv.SubMConv3d(64, 64, kernel_size=3),
+            spconv.SparseBatchNorm(64),
+            spconv.SparseReLU(),
+            # spconv.SparseConv3d(64, 64, kernel_size=kernel_size, algo=ConvAlgo.MaskImplicitGemm),
+            spconv.SubMConv3d(64, 64, kernel_size=3),
+            spconv.SparseBatchNorm(64),
+            spconv.SparseReLU(),
         )
     def forward(self, x):
         x = self.model(x)
@@ -70,9 +88,15 @@ class HanNet(nn.Module):
     def __init__(self, ) -> None:
         super().__init__()
         self.model = nn.Sequential(
-            spnn.Conv3d(1, 64, 5),
+            spnn.Conv3d(1, 64, kernel_size),
             spnn.BatchNorm(64),
-            spnn.ReLU()
+            spnn.ReLU(),
+            spnn.Conv3d(64, 64, kernel_size),
+            spnn.BatchNorm(64),
+            spnn.ReLU(),
+            spnn.Conv3d(64, 64, kernel_size),
+            spnn.BatchNorm(64),
+            spnn.ReLU(),
         )
     def forward(self, x):
         x = self.model(x)
@@ -140,13 +164,13 @@ hannet = HanNet().cuda()
 
 
 print(len(x_mink))
-for i in tqdm(range(500)):
+for i in tqdm(range(num_iters)):
     output = minknet(x_mink)
 
 
 
 print(len(x_sp.indices))
-for i in tqdm(range(500)):
+for i in tqdm(range(num_iters)):
     output = spnet(x_sp)
 
 
@@ -165,5 +189,5 @@ for k, feed_dict in tqdm(enumerate(dataflow)):
 
 
 print(len(inputs.coords))
-for i in tqdm(range(500)):
+for i in tqdm(range(num_iters)):
     output = hannet(inputs)
