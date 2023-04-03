@@ -1,6 +1,22 @@
 # A benchmark for sparse 3D conv python libraries
 
 
+- install sptr
+
+```
+conda create -n t3.8 python=3.8;
+conda activate t3.8;
+pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
+pip install torch_scatter==2.0.9
+pip install torch_geometric==1.7.2
+git clone https://github.com/dvlab-research/SparseTransformer.git
+cd SparseTransformer
+python setup.py install
+```
+
+
+
+
 - install mmloc
 
 ```
