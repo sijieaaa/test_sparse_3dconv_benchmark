@@ -9,6 +9,8 @@ conda activate t3.8;
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 pip install torch_scatter==2.0.9
 pip install torch_geometric==1.7.2
+pip install torch_cluster
+pip install timm
 git clone https://github.com/dvlab-research/SparseTransformer.git
 cd SparseTransformer
 python setup.py install
