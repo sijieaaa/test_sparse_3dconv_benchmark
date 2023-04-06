@@ -10,6 +10,7 @@ pip3 install torch torchvision torchaudio --index-url https://download.pytorch.o
 pip install torch_scatter==2.0.9
 pip install torch_geometric==1.7.2
 pip install torch_cluster
+pip install torch_sparse
 pip install timm
 git clone https://github.com/dvlab-research/SparseTransformer.git
 cd SparseTransformer
