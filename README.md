@@ -37,6 +37,23 @@ pip install tensorboard
 
 
 
+- install others
+
+```
+pip install tensorboard
+pip install tensorboardX
+pip install torchsummary
+pip install open3d
+cd
+git clone https://github.com/sijieaaa/pointnet2_torch_cuda11.git
+cd pointnet2_torch_cuda11
+python setup.py install
+```
+
+
+
+
+
 
 - Minkowski Engine
   https://github.com/NVIDIA/MinkowskiEngine
