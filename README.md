@@ -11,6 +11,9 @@ pip install torch_scatter==2.0.9
 pip install torch_geometric==1.7.2
 pip install torch_cluster
 pip install torch_sparse
+
+pip install torch_geometric torch_scatter torch_sparse torch_cluster -f https://data.pyg.org/whl/torch-2.1.0+cu118.html
+
 pip install timm
 git clone https://github.com/dvlab-research/SparseTransformer.git
 cd SparseTransformer
