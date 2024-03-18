@@ -36,6 +36,24 @@ def project_pc_on_image(pc, img, vel_to_cam_RT, P):
 
 
 
+def read_kittiraw_calib(vel_to_cam_path, cam_to_cam_path):
+    with open(vel_to_cam_path, 'r') as f:
+        lines = f.readlines()
+    vel_to_cam_R = lines[1].replace('R: ','').replace('\n','').split(' ')
+    vel_to_cam_R = np.array([float(e) for e in vel_to_cam_R])
+    vel_to_cam_R = vel_to_cam_R.reshape(3, 3)
+    vel_to_cam_T = lines[2].replace('T: ','').replace('\n','').split(' ')
+    vel_to_cam_T = np.array([float(e) for e in vel_to_cam_T])
+    vel_to_cam_RT = np.hstack([vel_to_cam_R, vel_to_cam_T[:,None]]) # 3x4
+
+    with open(cam_to_cam_path, 'r') as f:
+        lines = f.readlines()
+    P_rect_02 = lines[25].replace('P_rect_02: ','').replace('\n','').split(' ')
+    P_rect_02 = np.array([float(e) for e in P_rect_02])
+    P_rect_02 = P_rect_02.reshape(3, 4)
+
+    return vel_to_cam_RT, P_rect_02
+
 
 # vel_to_cam_R = np.array([7.533745e-03, -9.999714e-01, -6.166020e-04, 1.480249e-02, 7.280733e-04, -9.998902e-01, 9.998621e-01, 7.523790e-03, 1.480755e-02])
 # vel_to_cam_T = np.array([-4.069766e-03, -7.631618e-02, -2.717806e-01])
