@@ -18,7 +18,7 @@ cmaps = [
 ]
 
 
-def viz_lidar_open3d(posest=None, posesT=None, width=None, height=None):
+def viz_lidar_open3d(posest=None, posesT=None, width=None, height=None, return_pcd_list=False):
 
     vis = o3d.visualization.Visualizer()
     vis.create_window()
@@ -35,6 +35,8 @@ def viz_lidar_open3d(posest=None, posesT=None, width=None, height=None):
         mesh_frame.rotate(poseR, center=(0, 0, 0))
         mesh_frame.translate(poset)
         pcd_list.append(mesh_frame)
+    if return_pcd_list:
+        return pcd_list
     for frame in pcd_list:
         vis.add_geometry(frame)
 
