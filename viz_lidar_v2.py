@@ -26,7 +26,7 @@ def viz_lidar_open3dv2(posest=None, posesT=None, width=None, height=None, return
     '''
 
     pcd_list = []
-    # FOR1 is the base frame at (0,0,0) for reference.
+    # FOR1 is the base coordinate frame at (0,0,0) for reference.
     FOR1 = o3d.geometry.TriangleMesh.create_coordinate_frame(size=10, origin=[0, 0, 0])
     pcd_list = [FOR1]
 
