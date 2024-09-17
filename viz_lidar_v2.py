@@ -49,15 +49,9 @@ def viz_lidar_open3dv2(posest=None, posesT=None, width=None, height=None, return
 
     if return_pcd_list:
         return pcd_list
+    
+    o3d.visualization.draw_geometries(pcd_list)
         
-    vis = o3d.visualization.Visualizer()
-    vis.create_window()
-    for frame in pcd_list:
-        vis.add_geometry(frame)
-    vis.run()
-    vis.destroy_window()
-
-
 
 
 if __name__ == '__main__':
