@@ -21,7 +21,7 @@ cmap = np.random.rand(num_classes, 3)
 cmap[0] = [0, 0, 0]
 
 def viz_lidar_open3dv2(posest=None, posesT=None, width=None, height=None, return_pcd_list=False,
-                       colors=None, label_names=None, labelids=None):
+                       colors=None, label_names=None, labelids=None, useFOR1=True):
     '''
     posest: [n,3]. Contains 3D points (or translation vectors), no rotation.
     posesT: [n,4,4] or [n,3,4]. Contains 3x3 rotation matrix and 3x1 translation vector.
@@ -29,9 +29,9 @@ def viz_lidar_open3dv2(posest=None, posesT=None, width=None, height=None, return
     '''
 
     pcd_list = []
-    # FOR1 is the base coordinate frame at (0,0,0) for reference.
-    FOR1 = o3d.geometry.TriangleMesh.create_coordinate_frame(size=10, origin=[0, 0, 0])
-    pcd_list = [FOR1]
+    if useFOR1 == True:
+        FOR1 = o3d.geometry.TriangleMesh.create_coordinate_frame(size=2, origin=[0, 0, 0])
+        pcd_list = [FOR1]
 
     if posest is not None:
         pcd = o3d.geometry.PointCloud()
