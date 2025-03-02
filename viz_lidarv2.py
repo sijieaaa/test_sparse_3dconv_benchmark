@@ -5,6 +5,7 @@ import numpy as np
 import open3d as o3d
 from scipy.spatial.transform import Rotation
 from open3d.visualization import gui
+import json
 # c = 0.8
 # # RGB
 # cmaps = [
@@ -21,17 +22,18 @@ cmap = np.random.rand(num_classes, 3)
 cmap[0] = [0, 0, 0]
 
 def viz_lidar_open3dv2(posest=None, posesT=None, width=None, height=None, return_pcd_list=False,
-                       colors=None, label_names=None, labelids=None, useFOR1=True):
+                       colors=None, label_names=None, labelids=None, view_trajectory_path=None):
     '''
     posest: [n,3]. Contains 3D points (or translation vectors), no rotation.
     posesT: [n,4,4] or [n,3,4]. Contains 3x3 rotation matrix and 3x1 translation vector.
     colors: [n,3]. Range [0,1].
+    view_trajectory_path: can obtain using Ctrl+C in Open3D window.
     '''
 
     pcd_list = []
-    if useFOR1 == True:
-        FOR1 = o3d.geometry.TriangleMesh.create_coordinate_frame(size=2, origin=[0, 0, 0])
-        pcd_list = [FOR1]
+    # FOR1 is the base coordinate frame at (0,0,0) for reference.
+    FOR1 = o3d.geometry.TriangleMesh.create_coordinate_frame(size=10, origin=[0, 0, 0])
+    pcd_list = [FOR1]
 
     if posest is not None:
         pcd = o3d.geometry.PointCloud()
@@ -55,7 +57,38 @@ def viz_lidar_open3dv2(posest=None, posesT=None, width=None, height=None, return
     if return_pcd_list:
         return pcd_list
     
-    o3d.visualization.draw_geometries(pcd_list)
+
+
+    if view_trajectory_path != None:
+        with open(view_trajectory_path) as f:
+            view_params = json.load(f)
+        trajectory = view_params["trajectory"][0]
+        # 提取相机参数
+        front = np.array(trajectory["front"])      # 视角方向
+        lookat = np.array(trajectory["lookat"])    # 观察中心点
+        up = np.array(trajectory["up"])            # 相机上方向
+        zoom = trajectory["zoom"]                  # 缩放比例
+        # 创建可视化窗口
+        vis = o3d.visualization.Visualizer()
+        vis.create_window()
+        for pcd in pcd_list:
+            vis.add_geometry(pcd)
+        vis.poll_events()
+        vis.update_renderer()
+        # 获取 ViewControl
+        ctr = vis.get_view_control()
+        ctr.set_front(front)
+        ctr.set_lookat(lookat)
+        ctr.set_up(up)
+        ctr.set_zoom(zoom)
+        # RenderOption
+        opt = vis.get_render_option()
+        opt.point_size = 3.0  
+        # 运行可视化
+        vis.run()
+        vis.destroy_window()
+    else:
+        o3d.visualization.draw_geometries(pcd_list)
 
 
 
