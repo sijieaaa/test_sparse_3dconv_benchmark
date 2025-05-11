@@ -33,8 +33,11 @@ def viz_lidar_open3dv2(posest=None, posesT=None, width=None, height=None, return
 
     pcd_list = []
     # FOR1 is the base coordinate frame at (0,0,0) for reference.
-    FOR1 = o3d.geometry.TriangleMesh.create_coordinate_frame(size=for_size, origin=[0, 0, 0])
-    pcd_list = [FOR1]
+    pcd_list = []
+    if for_size > 0:
+        FOR1 = o3d.geometry.TriangleMesh.create_coordinate_frame(size=for_size, origin=[0, 0, 0])
+        pcd_list.append(FOR1)
+    
 
     if posest is not None:
         pcd = o3d.geometry.PointCloud()
