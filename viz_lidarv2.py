@@ -23,7 +23,7 @@ cmap[0] = [0, 0, 0]
 
 def viz_lidar_open3dv2(posest=None, posesT=None, width=None, height=None, return_pcd_list=False,
                        colors=None, label_names=None, labelids=None, view_trajectory_path=None,
-                       for_size=10):
+                       for_size=10, posesT_size=5):
     '''
     posest: [n,3]. Contains 3D points (or translation vectors), no rotation.
     posesT: [n,4,4] or [n,3,4]. Contains 3x3 rotation matrix and 3x1 translation vector.
@@ -53,7 +53,7 @@ def viz_lidar_open3dv2(posest=None, posesT=None, width=None, height=None, return
             poseR = poseT[:3, :3]  
             poseR= Rotation.from_matrix(poseR).as_matrix()
             poset = poseT[:3, 3] 
-            mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=5)
+            mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=posesT_size)
             mesh_frame.rotate(poseR, center=(0, 0, 0))
             mesh_frame.translate(poset)
             pcd_list.append(mesh_frame)
