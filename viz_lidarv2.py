@@ -28,7 +28,7 @@ def viz_lidar_open3dv2(posest=None, posesT=None, width=None, height=None, return
     posest: [n,3]. Contains 3D points (or translation vectors), no rotation.
     posesT: [n,4,4] or [n,3,4]. Contains 3x3 rotation matrix and 3x1 translation vector.
     colors: [n,3]. Range [0,1].
-    view_trajectory_path: can obtain using Ctrl+C in Open3D window.
+    view_trajectory_path: can obtain using D in Open3D window.
     '''
 
     pcd_list = []
@@ -63,36 +63,60 @@ def viz_lidar_open3dv2(posest=None, posesT=None, width=None, height=None, return
     
 
 
+    
     if view_trajectory_path != None:
-        with open(view_trajectory_path) as f:
-            view_params = json.load(f)
-        trajectory = view_params["trajectory"][0]
-        # 提取相机参数
-        front = np.array(trajectory["front"])      # 视角方向
-        lookat = np.array(trajectory["lookat"])    # 观察中心点
-        up = np.array(trajectory["up"])            # 相机上方向
-        zoom = trajectory["zoom"]                  # 缩放比例
-        # 创建可视化窗口
+        # 新增：从 JSON 加载 PinholeCameraParameters
+        cam_param = o3d.io.read_pinhole_camera_parameters(view_trajectory_path)
+
         vis = o3d.visualization.Visualizer()
         vis.create_window()
         for pcd in pcd_list:
             vis.add_geometry(pcd)
         vis.poll_events()
         vis.update_renderer()
-        # 获取 ViewControl
+
+        # 设置相机参数
         ctr = vis.get_view_control()
-        ctr.set_front(front)
-        ctr.set_lookat(lookat)
-        ctr.set_up(up)
-        ctr.set_zoom(zoom)
-        # RenderOption
+        ctr.convert_from_pinhole_camera_parameters(cam_param)
+
         opt = vis.get_render_option()
-        opt.point_size = 3.0  
-        # 运行可视化
+        opt.point_size = 3.0
         vis.run()
         vis.destroy_window()
     else:
         o3d.visualization.draw_geometries(pcd_list)
+
+
+    # if view_trajectory_path != None:
+    #     with open(view_trajectory_path) as f:
+    #         view_params = json.load(f)
+    #     trajectory = view_params["trajectory"][0]
+    #     # 提取相机参数
+    #     front = np.array(trajectory["front"])      # 视角方向
+    #     lookat = np.array(trajectory["lookat"])    # 观察中心点
+    #     up = np.array(trajectory["up"])            # 相机上方向
+    #     zoom = trajectory["zoom"]                  # 缩放比例
+    #     # 创建可视化窗口
+    #     vis = o3d.visualization.Visualizer()
+    #     vis.create_window()
+    #     for pcd in pcd_list:
+    #         vis.add_geometry(pcd)
+    #     vis.poll_events()
+    #     vis.update_renderer()
+    #     # 获取 ViewControl
+    #     ctr = vis.get_view_control()
+    #     ctr.set_front(front)
+    #     ctr.set_lookat(lookat)
+    #     ctr.set_up(up)
+    #     ctr.set_zoom(zoom)
+    #     # RenderOption
+    #     opt = vis.get_render_option()
+    #     opt.point_size = 3.0  
+    #     # 运行可视化
+    #     vis.run()
+    #     vis.destroy_window()
+    # else:
+    #     o3d.visualization.draw_geometries(pcd_list)
 
 
 
