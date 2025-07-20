@@ -84,7 +84,12 @@ def viz_lidar_open3dv2(posest=None, posesT=None, width=None, height=None, return
         vis.run()
         vis.destroy_window()
     else:
-        o3d.visualization.draw_geometries(pcd_list)
+        vis = o3d.visualization.Visualizer()
+        vis.create_window(window_name='Open3D Viewer', width=800, height=600)
+        for pcd in pcd_list:
+            vis.add_geometry(pcd)
+        vis.run()
+        vis.destroy_window()
 
 
     # if view_trajectory_path != None:
